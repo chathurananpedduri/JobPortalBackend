@@ -26,6 +26,9 @@ public class JwtUtil {
 
     @PostConstruct
     public void init() {
+        if (secret == null || secret.length() < 32) {
+            throw new IllegalArgumentException("JWT secret must be at least 32 characters long and not null. Current length: " + (secret == null ? 0 : secret.length()));
+        }
         this.SECRET_KEY = Keys.hmacShaKeyFor(secret.getBytes());
     }
 
