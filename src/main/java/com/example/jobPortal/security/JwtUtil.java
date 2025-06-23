@@ -3,6 +3,8 @@ package com.example.jobPortal.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -14,10 +16,16 @@ import java.util.function.Function;
 
 @Component
 public class JwtUtil {
-    private final SecretKey SECRET_KEY;
+    private SecretKey SECRET_KEY;
     private final long EXPIRATION_TIME = 1000 * 60 * 60 * 10; // 10 hours
+    private final String secret;
 
     public JwtUtil(@Value("${jwt.secret}") String secret) {
+        this.secret = secret;
+    }
+
+    @PostConstruct
+    public void init() {
         this.SECRET_KEY = Keys.hmacShaKeyFor(secret.getBytes());
     }
 
