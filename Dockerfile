@@ -21,7 +21,7 @@ EXPOSE 8080
 ENV DB_URL=""
 ENV DB_USERNAME=""
 ENV DB_PASSWORD=""
-ENV JWT_SECRET=""
+#ENV JWT_SECRET=""
 
 # Run the application
 CMD ["java", "-jar", "target/jobPortal-0.0.1-SNAPSHOT.jar"] 
