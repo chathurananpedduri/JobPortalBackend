@@ -4,11 +4,11 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,20 +16,18 @@ import java.util.function.Function;
 
 @Component
 public class JwtUtil {
+    @Value("${jwt.secret}")
+    private String secret;
+
     private SecretKey SECRET_KEY;
     private final long EXPIRATION_TIME = 1000 * 60 * 60 * 10; // 10 hours
-    private final String secret;
-
-    public JwtUtil(@Value("${jwt.secret}") String secret) {
-        this.secret = secret;
-    }
 
     @PostConstruct
     public void init() {
         if (secret == null || secret.length() < 32) {
             throw new IllegalArgumentException("JWT secret must be at least 32 characters long and not null. Current length: " + (secret == null ? 0 : secret.length()));
         }
-        this.SECRET_KEY = Keys.hmacShaKeyFor(secret.getBytes());
+        this.SECRET_KEY = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
     public String extractUsername(String token) {
@@ -64,9 +62,13 @@ public class JwtUtil {
     }
 
     private String createToken(Map<String, Object> claims, String subject) {
-        return Jwts.builder().claims(claims).subject(subject).issuedAt(new Date(System.currentTimeMillis()))
+        return Jwts.builder()
+                .claims(claims)
+                .subject(subject)
+                .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .signWith(SECRET_KEY).compact();
+                .signWith(SECRET_KEY)
+                .compact();
     }
 
     public Boolean validateToken(String token, String username) {
