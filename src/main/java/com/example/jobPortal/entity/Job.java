@@ -9,6 +9,7 @@ public class Job {
     private Long id;
 
     private String role;
+    @Column(length = 2000)
     private String description;
     private String applicationLink;
 
